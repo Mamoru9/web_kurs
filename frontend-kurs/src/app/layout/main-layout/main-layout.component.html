@@ -1,0 +1,22 @@
+<app-header></app-header>
+<div class="content">
+  <form [formGroup]="form">
+    <div class="row">
+      <mat-form-field>
+        <mat-label>Фамилия автора</mat-label>
+        <input type="text"
+               matInput
+               aria-label="Фамилия автора"
+               formControlName="lastNameAuthor"
+               [matAutocomplete]="author"
+               placeholder="Введите ФИО автора">
+        <mat-autocomplete autoActiveFirstOption #author="matAutocomplete">
+          <mat-option *ngFor="let author of filteredLastNameAuthor | async" [value]="author">
+            {{author.lastName}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+<app-loader *ngIf="loader"></app-loader>
