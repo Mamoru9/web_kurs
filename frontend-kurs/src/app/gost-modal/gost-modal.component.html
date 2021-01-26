@@ -1,0 +1,53 @@
+<div class="dialog">
+  <h1>{{'qwe'}}</h1>
+  <div class="dialog__content">
+    <ng-container>
+      <form [formGroup]="authorForm">
+        <div class="row">
+          <mat-form-field>
+            <mat-label>Фамилия автора</mat-label>
+            <input type="text"
+                   matInput
+                   aria-label="Фамилия автора"
+                   formControlName="lastNameAuthor"
+                   [matAutocomplete]="lastNameAuthor"
+                   placeholder="Введите фамилию автора">
+            <mat-autocomplete autoActiveFirstOption #lastNameAuthor="matAutocomplete">
+              <mat-option *ngFor="let lastName of filteredLastNameAuthor | async" [value]="lastName">
+                {{lastName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Имя автора</mat-label>
+            <input type="text"
+                   matInput
+                   aria-label="Имя автора"
+                   formControlName="firstNameAuthor"
+                   [matAutocomplete]="firstNameAuthor"
+                   placeholder="Введите имя автора">
+            <mat-autocomplete autoActiveFirstOption #firstNameAuthor="matAutocomplete">
+              <mat-option *ngFor="let firstName of filteredFirstNameAuthor | async" [value]="firstName">
+                {{firstName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Отчество автора</mat-label>
+            <input type="text"
+                   matInput
+                   aria-label="Отчество автора"
+                   formControlName="middleNameAuthor"
+                   [matAutocomplete]="middleNameAuthor"
+                   placeholder="Введите отчество автора">
+            <mat-autocomplete autoActiveFirstOption #middleNameAuthor="matAutocomplete">
+              <mat-option *ngFor="let middleName of filteredMiddleNameAuthor | async" [value]="middleName">
+                {{middleName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+</div>

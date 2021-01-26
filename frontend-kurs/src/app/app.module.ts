@@ -10,6 +10,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
+import { GostModalComponent } from './gost-modal/gost-modal.component';
+import {MatButtonModule} from '@angular/material/button';
+import {MatDialogModule} from '@angular/material/dialog';
 
 const appRoutes = [
   {
@@ -22,7 +25,8 @@ const appRoutes = [
   declarations: [
     AppComponent,
     MainLayoutComponent,
-    HeaderComponent
+    HeaderComponent,
+    GostModalComponent
   ],
   imports: [
     BrowserModule,
@@ -35,7 +39,9 @@ const appRoutes = [
     MatFormFieldModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
-    MatInputModule
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

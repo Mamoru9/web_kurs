@@ -21,9 +21,14 @@ export class AuthorsService {
     });
   }
 
-  filterAuthorLastName(value: string): Author[] {
-    const filterValue = value.toLowerCase();
-    return this.authors
-      .filter(author => author.lastName.toLowerCase().indexOf(filterValue));
+  filterAuthorByName(firstName: string, lastName: string, middleName: string, field: any): string[] {
+    if (firstName === '' && lastName === '' && middleName === '') {
+      return this.authors.map(author => author[field]);
+    }
+
+    return  this.authors.filter(author => firstName === '' ? author : author.firstName.toLowerCase().indexOf(firstName.toLowerCase()) === 0)
+      .filter(author => lastName === '' ? author : author.lastName.toLowerCase().indexOf(lastName.toLowerCase()) === 0)
+      .filter(author => middleName === '' ? author : author.middleName.toLowerCase().indexOf(middleName.toLowerCase()) === 0)
+      .map(author => author[field]);
   }
 }

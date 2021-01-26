@@ -9,6 +9,7 @@ import {Observable, Subject} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Author} from '../../shared/models/author';
 import {map, startWith} from 'rxjs/operators';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-main-layout',
@@ -20,22 +21,17 @@ export class MainLayoutComponent implements OnInit {
 
   isLoad = new Subject<boolean>();
   loader = true;
-  form: FormGroup;
-  filteredLastNameAuthor: Observable<Author[]>;
 
   constructor(private authorsService: AuthorsService, private booksService: BooksService,
               private responsibleService: ResponsibleService, private editorsService: EditorsService,
               private translatorsService: TranslatorsService, private translationsService: TranslationsService,
-              private cdr: ChangeDetectorRef, private formBuilder: FormBuilder) {
+              private cdr: ChangeDetectorRef, private dialog: MatDialog) {
   }
 
   async ngOnInit() {
     this.isLoad.subscribe(val => {
       this.loader = val;
       this.cdr.markForCheck();
-    });
-    this.form = this.formBuilder.group({
-      lastNameAuthor: [null]
     });
     await this.authorsService.getAuthors();
     await this.booksService.getBooks();
@@ -44,9 +40,9 @@ export class MainLayoutComponent implements OnInit {
     await this.translatorsService.getTranslators();
     await this.translationsService.getTranslations();
     this.isLoad.next(false);
-    this.filteredLastNameAuthor = this.form.controls.lastNameAuthor.valueChanges.pipe(
-      startWith(''),
-      map(value => this.authorsService.filterAuthorLastName(value))
-    )
+  }
+
+  openDialog() {
+
   }
 }
