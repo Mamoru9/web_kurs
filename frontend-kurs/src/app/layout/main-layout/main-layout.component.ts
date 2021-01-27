@@ -10,6 +10,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {Author} from '../../shared/models/author';
 import {map, startWith} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
+import {GostModalComponent} from '../../gost-modal/gost-modal.component';
 
 @Component({
   selector: 'app-main-layout',
@@ -42,7 +43,7 @@ export class MainLayoutComponent implements OnInit {
     this.isLoad.next(false);
   }
 
-  openDialog() {
-
+  openDialog(): void {
+    this.dialog.open(GostModalComponent);
   }
 }

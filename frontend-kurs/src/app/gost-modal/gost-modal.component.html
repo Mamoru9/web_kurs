@@ -1,13 +1,17 @@
 <div class="dialog">
-  <h1>{{'qwe'}}</h1>
+  <h1>{{modalTitle}}</h1>
   <div class="dialog__content">
-    <ng-container>
-      <form [formGroup]="authorForm">
+    <form [formGroup]="form">
+      <ng-container *ngIf="isAuthorStep">
+        <div class="row">
+          Введите или выберите из списка ФИО автора книги.
+        </div>
         <div class="row">
           <mat-form-field>
             <mat-label>Фамилия автора</mat-label>
             <input type="text"
                    matInput
+                   required
                    aria-label="Фамилия автора"
                    formControlName="lastNameAuthor"
                    [matAutocomplete]="lastNameAuthor"
@@ -22,6 +26,7 @@
             <mat-label>Имя автора</mat-label>
             <input type="text"
                    matInput
+                   required
                    aria-label="Имя автора"
                    formControlName="firstNameAuthor"
                    [matAutocomplete]="firstNameAuthor"
@@ -47,7 +52,69 @@
             </mat-autocomplete>
           </mat-form-field>
         </div>
-      </form>
-    </ng-container>
+        <div class="row error" *ngIf="isError">
+          {{errorText}}
+        </div>
+      </ng-container>
+      <ng-container *ngIf="isEditorsStep">
+        <div class="row">
+          Добавте ответственного или ответственных для вашей книги.
+        </div>
+        <div class="row">
+          <mat-form-field>
+            <mat-label>Фамилия ответственного</mat-label>
+            <input type="text"
+                   matInput
+                   required
+                   aria-label="Фамилия ответственного"
+                   formControlName="lastNameEditor"
+                   [matAutocomplete]="lastNameEditor"
+                   placeholder="Введите фамилию ответственного">
+            <mat-autocomplete autoActiveFirstOption #lastNameEditor="matAutocomplete">
+              <mat-option *ngFor="let lastName of filteredLastNameEditor | async" [value]="lastName">
+                {{lastName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Имя ответственного</mat-label>
+            <input type="text"
+                   matInput
+                   required
+                   aria-label="Имя ответственного"
+                   formControlName="firstNameEditor"
+                   [matAutocomplete]="firstNameEditor"
+                   placeholder="Введите имя ответственного">
+            <mat-autocomplete autoActiveFirstOption #firstNameEditor="matAutocomplete">
+              <mat-option *ngFor="let firstName of filteredFirstNameEditor | async" [value]="firstName">
+                {{firstName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Отчество ответственного</mat-label>
+            <input type="text"
+                   matInput
+                   aria-label="Отчество ответственного"
+                   formControlName="middleNameEditor"
+                   [matAutocomplete]="middleNameEditor"
+                   placeholder="Введите отчество ответственного">
+            <mat-autocomplete autoActiveFirstOption #middleNameEditor="matAutocomplete">
+              <mat-option *ngFor="let middleName of filteredMiddleNameEditor | async" [value]="middleName">
+                {{middleName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="row error" *ngIf="isError">
+          {{errorText}}
+        </div>
+      </ng-container>
+    </form>
+    <div class="button">
+      <button mat-raised-button color="primary" (click)="nextButtonClick()">{{nextStepButtonText}}</button>
+      <button *ngIf="isSkipButton" mat-raised-button>Пропустить</button>
+      <button *ngIf="isAddButton" mat-raised-button (click)="addButtonClick()">Добавить</button>
+    </div>
   </div>
 </div>
