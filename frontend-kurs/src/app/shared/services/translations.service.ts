@@ -20,4 +20,13 @@ export class TranslationsService {
       });
     });
   }
+
+  findByTranslatorIds(ids: number[]): number[] {
+    let result = [];
+    ids.forEach((id, index) => {
+      const temp = this.translations.filter(trans => trans.translatorId === id);
+      result = index === 0 ? temp : temp.filter(value => result.includes(value));
+    });
+    return result.map(value => value.bookId);
+  }
 }

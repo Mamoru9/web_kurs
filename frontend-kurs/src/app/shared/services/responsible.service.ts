@@ -20,4 +20,13 @@ export class ResponsibleService {
       });
     });
   }
+
+  findByEditorIds(ids: number[]) {
+    let result = [];
+    ids.forEach((id, index) => {
+      const temp = this.responsible.filter(res => res.editorId === id);
+      result = index === 0 ? temp : temp.filter(value => result.includes(value));
+    });
+    return result.map(value => value.bookId);
+  }
 }

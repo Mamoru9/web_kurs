@@ -110,10 +110,63 @@
           {{errorText}}
         </div>
       </ng-container>
+      <ng-container *ngIf="isTranslatorsStep">
+        <div class="row">
+          Добавте одного или несколько переводчиков.
+        </div>
+        <div class="row">
+          <mat-form-field>
+            <mat-label>Фамилия переводчика</mat-label>
+            <input type="text"
+                   matInput
+                   required
+                   aria-label="Фамилия переводчика"
+                   formControlName="lastNameTranslator"
+                   [matAutocomplete]="lastNameTranslator"
+                   placeholder="Введите фамилию переводчика">
+            <mat-autocomplete autoActiveFirstOption #lastNameTranslator="matAutocomplete">
+              <mat-option *ngFor="let lastName of filteredLastNameTranslator | async" [value]="lastName">
+                {{lastName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Имя переводчика</mat-label>
+            <input type="text"
+                   matInput
+                   required
+                   aria-label="Имя переводчика"
+                   formControlName="firstNameTranslator"
+                   [matAutocomplete]="firstNameTranslator"
+                   placeholder="Введите имя ответственного">
+            <mat-autocomplete autoActiveFirstOption #firstNameTranslator="matAutocomplete">
+              <mat-option *ngFor="let firstName of filteredFirstNameTranslator | async" [value]="firstName">
+                {{firstName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Отчество переводчика</mat-label>
+            <input type="text"
+                   matInput
+                   aria-label="Отчество переводчика"
+                   formControlName="middleNameTranslator"
+                   [matAutocomplete]="middleNameTranslator"
+                   placeholder="Введите отчество переводчика">
+            <mat-autocomplete autoActiveFirstOption #middleNameTranslator="matAutocomplete">
+              <mat-option *ngFor="let middleName of filteredMiddleNameTranslator | async" [value]="middleName">
+                {{middleName}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="row error" *ngIf="isError">
+          {{errorText}}
+        </div>
+      </ng-container>
     </form>
     <div class="button">
       <button mat-raised-button color="primary" (click)="nextButtonClick()">{{nextStepButtonText}}</button>
-      <button *ngIf="isSkipButton" mat-raised-button>Пропустить</button>
       <button *ngIf="isAddButton" mat-raised-button (click)="addButtonClick()">Добавить</button>
     </div>
   </div>
