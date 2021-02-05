@@ -29,4 +29,10 @@ export class TranslationsService {
     });
     return result.map(value => value.bookId);
   }
+
+  async addTranslations(trans: any): Promise<any> {
+    await this.http.post<any>(this.url + 'translation', trans).subscribe(res => {
+      this.getTranslations();
+    });
+  }
 }

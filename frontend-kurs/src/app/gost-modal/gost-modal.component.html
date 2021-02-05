@@ -164,10 +164,55 @@
           {{errorText}}
         </div>
       </ng-container>
+      <ng-container *ngIf="isSelectBookStep">
+        <div class="row">
+          Тут какой-то текст
+        </div>
+        <div class="row">
+          <mat-form-field appearance="fill">
+            <mat-label>Выберете книгу из списка</mat-label>
+            <mat-select [(ngModel)]="selectedBook" name="food">
+              <mat-option *ngFor="let book of bookList" [value]="book">
+                {{book}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="isAddBookStep">
+        <div class="row">
+          Добавте произведение.
+        </div>
+        <div class="row">
+          <mat-form-field>
+            <mat-label>Название</mat-label>
+            <input matInput type="text" formControlName="bookTitle">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Место издания</mat-label>
+            <input matInput type="text" formControlName="bookPlace">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Издательство</mat-label>
+            <input matInput type="text" formControlName="bookEdition">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Год</mat-label>
+            <input matInput type="number" formControlName="bookYear">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Количество страниц</mat-label>
+            <input matInput type="number" formControlName="bookNumberOfPage">
+          </mat-form-field>
+        </div>
+        <div class="row error" *ngIf="isError">
+          {{errorText}}
+        </div>
+      </ng-container>
     </form>
     <div class="button">
       <button mat-raised-button color="primary" (click)="nextButtonClick()">{{nextStepButtonText}}</button>
-      <button *ngIf="isAddButton" mat-raised-button (click)="addButtonClick()">Добавить</button>
+      <button *ngIf="isAddButton" mat-raised-button (click)="addButtonClick()">{{addButtonText}}</button>
     </div>
   </div>
 </div>

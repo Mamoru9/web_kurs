@@ -12,7 +12,7 @@ export class ResponsibleService {
 
   constructor(private http: HttpClient) { }
 
-  async getResponsible() {
+  async getResponsible(): Promise<any> {
     this.responsible = [];
     await this.http.get<any>(this.url + 'responsible').subscribe(res => {
       res.forEach(r => {
@@ -21,12 +21,18 @@ export class ResponsibleService {
     });
   }
 
-  findByEditorIds(ids: number[]) {
+  findByEditorIds(ids: number[]): number[] {
     let result = [];
     ids.forEach((id, index) => {
       const temp = this.responsible.filter(res => res.editorId === id);
       result = index === 0 ? temp : temp.filter(value => result.includes(value));
     });
     return result.map(value => value.bookId);
+  }
+
+  async addResponsible(res: any): Promise<any> {
+    await this.http.post<any>(this.url + 'responsible', res).subscribe(resp => {
+      this.getResponsible();
+    });
   }
 }

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {AuthorsService} from '../shared/services/authors.service';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
@@ -11,6 +11,7 @@ import {Translator} from '../shared/models/translator';
 import {ResponsibleService} from '../shared/services/responsible.service';
 import {TranslationsService} from '../shared/services/translations.service';
 import {Book} from '../shared/models/book';
+import {BooksService} from '../shared/services/books.service';
 
 @Component({
   selector: 'app-gost-modal',
@@ -29,26 +30,34 @@ export class GostModalComponent implements OnInit {
   filteredLastNameTranslator: Observable<string[]>;
   filteredFirstNameTranslator: Observable<string[]>;
   filteredMiddleNameTranslator: Observable<string[]>;
+  bookList: string[];
   currentAuthor: Author;
   currentEditors: Editor[] = [];
   currentTranslators: Translator[] = [];
+  finalBook: Book;
   form: FormGroup;
   modalTitle: string;
   nextStepButtonText: string;
   isAddButton = false;
   isError = false;
   errorText = 'Заполните все поля';
+  addButtonText = 'Добавить';
   isAuthorStep = true;
   isEditorsStep = false;
   isTranslatorsStep = false;
   isSelectBookStep = false;
   isAddBookStep = false;
+  isFinalStep = false;
+  isAddedBook: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isBooksStep: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  books: Book[] = [];
+  booksIds = [];
+  selectedBook = null;
+
 
   constructor(private authorsService: AuthorsService, private fb: FormBuilder, private editorsService: EditorsService,
               private translatorsService: TranslatorsService, private responsibleService: ResponsibleService,
-              private translationsService: TranslationsService) { }
+              private translationsService: TranslationsService, private booksService: BooksService,
+              private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -60,7 +69,12 @@ export class GostModalComponent implements OnInit {
       middleNameEditor: [''],
       lastNameTranslator: [''],
       firstNameTranslator: [''],
-      middleNameTranslator: ['']
+      middleNameTranslator: [''],
+      bookTitle: [''],
+      bookPlace: [''],
+      bookYear: [''],
+      bookNumberOfPage: [''],
+      bookEdition: ['']
     });
 
     this.filteredLastNameAuthor = this.form.controls.lastNameAuthor.valueChanges.pipe(
@@ -111,6 +125,8 @@ export class GostModalComponent implements OnInit {
 
     this.isBooksStep.subscribe(value => {
       if (value) {
+        this.currentAuthor = this.authorsService.findAuthor(this.currentAuthor.firstName, this.currentAuthor.lastName, this.currentAuthor.middleName);
+        this.booksIds = this.booksService.getBooksByAuthorId(this.currentAuthor.id);
         let editorsBooks = [];
         let translatorsBooks = [];
         if (this.currentEditors.length) {
@@ -121,16 +137,30 @@ export class GostModalComponent implements OnInit {
           this.currentTranslators = this.currentTranslators.map(translator => this.translatorsService.findTranslator(translator.firstName, translator.lastName, translator.middleName));
           translatorsBooks = this.translationsService.findByTranslatorIds(this.currentTranslators.map(translators => translators.id));
         }
-        this.books = editorsBooks.filter(eBook => translatorsBooks.includes(eBook));
-        if (this.books.length) {
+        this.addButtonText = 'Получить ГОСТ';
+        const tempBooks = editorsBooks.filter(eBook => translatorsBooks.includes(eBook));
+        this.booksIds = this.booksIds.filter(book => tempBooks.includes(book)).map(book => book.id);
+        if (this.booksIds.length) {
+          this.bookList = this.booksService.getBooksTitleById(this.booksIds);
           this.modalTitle = 'Выбрать литератутру из существующих';
+          this.errorText = 'Выбирите книгу из списка';
           this.isSelectBookStep = true;
         } else {
           this.modalTitle = 'Добавить новую литературу';
+          this.isAddButton = false;
           this.isAddBookStep = true;
         }
       }
     });
+
+    this.isAddedBook.subscribe(value => {
+      if (value) {
+        this.finalBook = this.booksService.getBook(this.finalBook.title, this.finalBook.place, this.finalBook.edition, this.finalBook.year, this.finalBook.numberOfPage, this.finalBook.authorId);
+        this.currentEditors.forEach(editor => {this.responsibleService.addResponsible({editorId: editor.id, bookId: this.finalBook.id}); });
+        this.currentTranslators.forEach(translator => {this.translationsService.addTranslations({translatorId: translator.id, bookId: this.finalBook.id}); });
+        this.cdr.markForCheck();
+      }
+    })
 
     this.modalTitle = 'Введите ФИО автора';
     this.nextStepButtonText = 'Далее';
@@ -160,6 +190,29 @@ export class GostModalComponent implements OnInit {
     } else if (this.isTranslatorsStep) {
       this.isTranslatorsStep = this.isError = false;
       this.isBooksStep.next(true);
+    } else if (this.isSelectBookStep) {
+      if (this.selectedBook !== null) {
+        this.isError = true;
+      } else {
+        this.finalBook = this.booksService.getBookByTitle(this.selectedBook);
+        this.isError = this.isAddButton = false;
+        this.isFinalStep = true;
+      }
+    } else if (this.isAddBookStep) {
+      const bookTitle = this.form.controls.bookTitile.value;
+      const bookPlace = this.form.controls.bookPlace.value;
+      const bookYear = this.form.controls.bookYear.value;
+      const bookNumberOfPage = this.form.controls.bookNumberOfPage.value;
+      const bookEdition = this.form.controls.bookEdition.value;
+      if (bookTitle === '' || bookPlace === '' || bookYear === '' || bookNumberOfPage === '' || bookEdition === '') {
+        this.isError = true;
+      } else {
+        await this.booksService.addBook({title: bookTitle, place: bookPlace, edition: bookEdition, year: bookYear, numberOfPage: bookNumberOfPage, authorId: this.currentAuthor.id});
+        this.finalBook = new Book({title: bookTitle, place: bookPlace, edition: bookEdition, year: bookYear, numberOfPage: bookNumberOfPage, authorId: this.currentAuthor.id});
+        this.isError = false;
+        this.isFinalStep = true;
+        this.isAddedBook.next(true);
+      }
     }
   }
 
