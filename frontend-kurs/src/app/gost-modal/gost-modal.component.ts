@@ -160,7 +160,7 @@ export class GostModalComponent implements OnInit {
         this.currentTranslators.forEach(translator => {this.translationsService.addTranslations({translatorId: translator.id, bookId: this.finalBook.id}); });
         this.cdr.markForCheck();
       }
-    })
+    });
 
     this.modalTitle = 'Введите ФИО автора';
     this.nextStepButtonText = 'Далее';
@@ -258,6 +258,12 @@ export class GostModalComponent implements OnInit {
         this.isError = false;
       }
     }
+  }
+
+  arrayToView(arr: any): string {
+    let result = '';
+    arr.forEach(value => result = result + value.lastName + value.firstName[0] + '.' + (value.middleName ? value.middleName[0] : '') + '.,' );
+    return result;
   }
 
 }

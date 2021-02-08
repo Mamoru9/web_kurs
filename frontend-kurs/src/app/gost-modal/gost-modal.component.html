@@ -209,6 +209,11 @@
           {{errorText}}
         </div>
       </ng-container>
+      <ng-container *ngIf="isFinalStep">
+        <div class="row">
+          <strong>{{currentAuthor.lastName + ' ' + currentAuthor.firstName[0] + '. ' + (currentAuthor.middleName ? currentAuthor[0] + '. ' : '') + finalBook.title + '/' + (currentEditors | mapFunPipe : arrayToView) + '; ' + (currentTranslators | mapFunPipe : arrayToView) + ' - ' + finalBook.place + ': ' + finalBook.edition + ', ' + finalBook.year + '. - ' + finalBook.numberOfPage + '.'}}</strong>
+        </div>
+      </ng-container>
     </form>
     <div class="button">
       <button mat-raised-button color="primary" (click)="nextButtonClick()">{{nextStepButtonText}}</button>
