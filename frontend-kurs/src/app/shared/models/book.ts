@@ -12,7 +12,7 @@ export class Book {
       return;
     }
 
-    this.id = source.id || null;
+    this.id = source.Id || null;
     this.title = source.title || null;
     this.place = source.place || null;
     this.edition = source.edition || null;

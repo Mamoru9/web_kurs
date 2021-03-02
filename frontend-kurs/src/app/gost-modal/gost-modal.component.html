@@ -58,7 +58,7 @@
       </ng-container>
       <ng-container *ngIf="isEditorsStep">
         <div class="row">
-          Добавте ответственного или ответственных для вашей книги.
+          Добавте ответственного или ответственных для вашей книги. Чтобы перейти на слежующий шаг нажмите кнопку "Далее".
         </div>
         <div class="row">
           <mat-form-field>
@@ -112,7 +112,7 @@
       </ng-container>
       <ng-container *ngIf="isTranslatorsStep">
         <div class="row">
-          Добавте одного или несколько переводчиков.
+          Добавте одного или несколько переводчиков. Чтобы перейти на слежующий шаг нажмите кнопку "Далее".
         </div>
         <div class="row">
           <mat-form-field>
@@ -166,35 +166,38 @@
       </ng-container>
       <ng-container *ngIf="isSelectBookStep">
         <div class="row">
-          Тут какой-то текст
+          Выберете книгу из списка или добавте новую.
         </div>
         <div class="row">
           <mat-form-field appearance="fill">
             <mat-label>Выберете книгу из списка</mat-label>
-            <mat-select [(ngModel)]="selectedBook" name="food">
+            <mat-select [(ngModel)]="selectedBook" formControlName="book">
               <mat-option *ngFor="let book of bookList" [value]="book">
                 {{book}}
               </mat-option>
             </mat-select>
           </mat-form-field>
         </div>
+        <div class="row error" *ngIf="isError">
+          {{errorText}}
+        </div>
       </ng-container>
       <ng-container *ngIf="isAddBookStep">
         <div class="row">
-          Добавте произведение.
+          Добавте новое произведение.
         </div>
         <div class="row">
           <mat-form-field>
             <mat-label>Название</mat-label>
-            <input matInput type="text" formControlName="bookTitle">
+            <input matInput type="text" autocomplete="off" formControlName="bookTitle">
           </mat-form-field>
           <mat-form-field>
             <mat-label>Место издания</mat-label>
-            <input matInput type="text" formControlName="bookPlace">
+            <input matInput type="text" autocomplete="off" formControlName="bookPlace">
           </mat-form-field>
           <mat-form-field>
             <mat-label>Издательство</mat-label>
-            <input matInput type="text" formControlName="bookEdition">
+            <input matInput type="text" autocomplete="off" formControlName="bookEdition">
           </mat-form-field>
           <mat-form-field>
             <mat-label>Год</mat-label>
@@ -211,7 +214,10 @@
       </ng-container>
       <ng-container *ngIf="isFinalStep">
         <div class="row">
-          <strong>{{currentAuthor.lastName + ' ' + currentAuthor.firstName[0] + '. ' + (currentAuthor.middleName ? currentAuthor[0] + '. ' : '') + finalBook.title + '/' + (currentEditors | mapFunPipe : arrayToView) + '; ' + (currentTranslators | mapFunPipe : arrayToView) + ' - ' + finalBook.place + ': ' + finalBook.edition + ', ' + finalBook.year + '. - ' + finalBook.numberOfPage + '.'}}</strong>
+          Результат.
+        </div>
+        <div class="row">
+          <strong>{{currentAuthor.lastName + ' ' + currentAuthor.firstName[0] + '. ' + (currentAuthor.middleName ? currentAuthor.middleName[0] + '. ' : '') + finalBook.title + '/' + (currentEditors | mapFunPipe : arrayToView) + '; ' + (currentTranslators | mapFunPipe : arrayToView) + ' - ' + finalBook.place + ': ' + finalBook.edition + ', ' + finalBook.year + '. - ' + finalBook.numberOfPage + '.'}}</strong>
         </div>
       </ng-container>
     </form>

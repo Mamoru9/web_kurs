@@ -9,7 +9,7 @@ export class Translator {
       return;
     }
 
-    this.id = source.ID || null;
+    this.id = source.Id || null;
     this.firstName = source.firstName || null;
     this.lastName = source.lastName || null;
     this.middleName = source.middleName || null;

@@ -7,7 +7,7 @@ import {Author} from '../models/author';
 })
 export class AuthorsService {
 
-  private url = 'http://localhost:8080/api/v1/';
+  private url = 'http://localhost:80/api/v1/';
   authors: Author[];
 
   constructor(private http: HttpClient) { }

@@ -8,7 +8,7 @@ import {Author} from '../models/author';
 })
 export class TranslatorsService {
 
-  private url = 'http://localhost:8080/api/v1/';
+  private url = 'http://localhost:80/api/v1/';
   translators: Translator[];
 
   constructor(private http: HttpClient) { }

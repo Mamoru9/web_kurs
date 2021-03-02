@@ -12,6 +12,7 @@ import {ResponsibleService} from '../shared/services/responsible.service';
 import {TranslationsService} from '../shared/services/translations.service';
 import {Book} from '../shared/models/book';
 import {BooksService} from '../shared/services/books.service';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-gost-modal',
@@ -48,7 +49,6 @@ export class GostModalComponent implements OnInit {
   isSelectBookStep = false;
   isAddBookStep = false;
   isFinalStep = false;
-  isAddedBook: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isBooksStep: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   booksIds = [];
   selectedBook = null;
@@ -57,7 +57,7 @@ export class GostModalComponent implements OnInit {
   constructor(private authorsService: AuthorsService, private fb: FormBuilder, private editorsService: EditorsService,
               private translatorsService: TranslatorsService, private responsibleService: ResponsibleService,
               private translationsService: TranslationsService, private booksService: BooksService,
-              private cdr: ChangeDetectorRef) { }
+              private cdr: ChangeDetectorRef, private dialogRef: MatDialogRef<any>) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -70,6 +70,7 @@ export class GostModalComponent implements OnInit {
       lastNameTranslator: [''],
       firstNameTranslator: [''],
       middleNameTranslator: [''],
+      book: [''],
       bookTitle: [''],
       bookPlace: [''],
       bookYear: [''],
@@ -137,28 +138,20 @@ export class GostModalComponent implements OnInit {
           this.currentTranslators = this.currentTranslators.map(translator => this.translatorsService.findTranslator(translator.firstName, translator.lastName, translator.middleName));
           translatorsBooks = this.translationsService.findByTranslatorIds(this.currentTranslators.map(translators => translators.id));
         }
-        this.addButtonText = 'Получить ГОСТ';
         const tempBooks = editorsBooks.filter(eBook => translatorsBooks.includes(eBook));
-        this.booksIds = this.booksIds.filter(book => tempBooks.includes(book)).map(book => book.id);
+        this.booksIds = this.booksIds.filter(book => tempBooks.includes(book.id)).map(book => book.id);
+        this.nextStepButtonText = 'Получить ГОСТ';
         if (this.booksIds.length) {
           this.bookList = this.booksService.getBooksTitleById(this.booksIds);
           this.modalTitle = 'Выбрать литератутру из существующих';
           this.errorText = 'Выбирите книгу из списка';
+          this.addButtonText = 'Добавить';
           this.isSelectBookStep = true;
         } else {
           this.modalTitle = 'Добавить новую литературу';
           this.isAddButton = false;
           this.isAddBookStep = true;
         }
-      }
-    });
-
-    this.isAddedBook.subscribe(value => {
-      if (value) {
-        this.finalBook = this.booksService.getBook(this.finalBook.title, this.finalBook.place, this.finalBook.edition, this.finalBook.year, this.finalBook.numberOfPage, this.finalBook.authorId);
-        this.currentEditors.forEach(editor => {this.responsibleService.addResponsible({editorId: editor.id, bookId: this.finalBook.id}); });
-        this.currentTranslators.forEach(translator => {this.translationsService.addTranslations({translatorId: translator.id, bookId: this.finalBook.id}); });
-        this.cdr.markForCheck();
       }
     });
 
@@ -191,15 +184,17 @@ export class GostModalComponent implements OnInit {
       this.isTranslatorsStep = this.isError = false;
       this.isBooksStep.next(true);
     } else if (this.isSelectBookStep) {
-      if (this.selectedBook !== null) {
+      if (this.selectedBook === null) {
+        this.errorText = 'Выберете книгу из списка или добавте новую.';
         this.isError = true;
       } else {
+        this.nextStepButtonText = 'Готово';
         this.finalBook = this.booksService.getBookByTitle(this.selectedBook);
-        this.isError = this.isAddButton = false;
+        this.isError = this.isAddButton = this.isSelectBookStep = false;
         this.isFinalStep = true;
       }
     } else if (this.isAddBookStep) {
-      const bookTitle = this.form.controls.bookTitile.value;
+      const bookTitle = this.form.controls.bookTitle.value;
       const bookPlace = this.form.controls.bookPlace.value;
       const bookYear = this.form.controls.bookYear.value;
       const bookNumberOfPage = this.form.controls.bookNumberOfPage.value;
@@ -207,12 +202,17 @@ export class GostModalComponent implements OnInit {
       if (bookTitle === '' || bookPlace === '' || bookYear === '' || bookNumberOfPage === '' || bookEdition === '') {
         this.isError = true;
       } else {
-        await this.booksService.addBook({title: bookTitle, place: bookPlace, edition: bookEdition, year: bookYear, numberOfPage: bookNumberOfPage, authorId: this.currentAuthor.id});
+        await this.booksService.addBook({title: bookTitle, place: bookPlace, edition: bookEdition, year: bookYear.toString(), numberOfPage: bookNumberOfPage, authorId: this.currentAuthor.id});
         this.finalBook = new Book({title: bookTitle, place: bookPlace, edition: bookEdition, year: bookYear, numberOfPage: bookNumberOfPage, authorId: this.currentAuthor.id});
-        this.isError = false;
+        this.isError = this.isAddBookStep = false;
         this.isFinalStep = true;
-        this.isAddedBook.next(true);
+        this.nextStepButtonText = 'Готово';
       }
+    } else if (this.isFinalStep) {
+      this.finalBook = this.booksService.getBook(this.finalBook.title, this.finalBook.place, this.finalBook.edition, this.finalBook.year, this.finalBook.numberOfPage, this.finalBook.authorId);
+      this.currentEditors.forEach(editor => {this.responsibleService.addResponsible({editorId: editor.id, bookId: this.finalBook.id}); });
+      this.currentTranslators.forEach(translator => {this.translationsService.addTranslations({translatorId: translator.id, bookId: this.finalBook.id}); });
+      this.dialogRef.close();
     }
   }
 
@@ -257,12 +257,16 @@ export class GostModalComponent implements OnInit {
         this.form.controls.middleNameTranslator.setValue('');
         this.isError = false;
       }
+    } else if (this.isSelectBookStep) {
+      this.modalTitle = 'Добавить новую литературу';
+      this.isAddButton = this.isSelectBookStep = false;
+      this.isAddBookStep = true;
     }
   }
 
   arrayToView(arr: any): string {
     let result = '';
-    arr.forEach(value => result = result + value.lastName + value.firstName[0] + '.' + (value.middleName ? value.middleName[0] : '') + '.,' );
+    arr.forEach((value, ind) => result = result + value.lastName + value.firstName[0] + '.' + (value.middleName ? value.middleName[0] : '') + '.' + (ind === arr.length - 1 ? '' : ',') );
     return result;
   }
 

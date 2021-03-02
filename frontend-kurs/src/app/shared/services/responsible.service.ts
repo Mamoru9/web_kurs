@@ -7,7 +7,7 @@ import {HttpClient} from '@angular/common/http';
 })
 export class ResponsibleService {
 
-  private url = 'http://localhost:8080/api/v1/';
+  private url = 'http://localhost:80/api/v1/';
   responsible: Responsible[];
 
   constructor(private http: HttpClient) { }
@@ -25,7 +25,7 @@ export class ResponsibleService {
     let result = [];
     ids.forEach((id, index) => {
       const temp = this.responsible.filter(res => res.editorId === id);
-      result = index === 0 ? temp : temp.filter(value => result.includes(value));
+      result = index === 0 ? temp : result.concat(temp.filter(value => result.includes(value)));
     });
     return result.map(value => value.bookId);
   }

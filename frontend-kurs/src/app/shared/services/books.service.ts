@@ -7,7 +7,7 @@ import {HttpClient} from '@angular/common/http';
 })
 export class BooksService {
 
-  private url = 'http://localhost:8080/api/v1/';
+  private url = 'http://localhost:80/api/v1/';
   books: Book[];
 
   constructor(private http: HttpClient) { }
@@ -44,6 +44,6 @@ export class BooksService {
   }
 
   getBook(title: string, place: string, edition: string, year: string, numberOfPage: number, authorId: number): Book {
-    return this.books.find(book => book.title === title && book.place === place && book.edition === edition && book.year === year && book.numberOfPage === numberOfPage && book.authorId === authorId);
+    return this.books.find(book => book.title === title && book.place === place && book.edition === edition && book.year === year.toString() && book.numberOfPage === numberOfPage && book.authorId === authorId);
   }
 }

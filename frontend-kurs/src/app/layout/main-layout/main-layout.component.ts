@@ -34,16 +34,22 @@ export class MainLayoutComponent implements OnInit {
       this.loader = val;
       this.cdr.markForCheck();
     });
+    await this.getData()
+    this.isLoad.next(false);
+  }
+
+  openDialog(): void {
+    this.dialog.open(GostModalComponent).afterClosed().subscribe(() => {
+      this.getData();
+    });
+  }
+
+  async getData() {
     await this.authorsService.getAuthors();
     await this.booksService.getBooks();
     await this.responsibleService.getResponsible();
     await this.editorsService.getEditors();
     await this.translatorsService.getTranslators();
     await this.translationsService.getTranslations();
-    this.isLoad.next(false);
-  }
-
-  openDialog(): void {
-    this.dialog.open(GostModalComponent);
   }
 }
