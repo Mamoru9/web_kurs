@@ -34,7 +34,7 @@ func (p *Provider) GetTranslationsDB() ([]model.Translation, error) {
 		translations = make([]model.Translation, 0)
 	)
 
-	q = `SELECT * FROM kursovaya.translations`
+	q = `SELECT book_id,translator_id FROM kursovaya.translations`
 
 	rows, err := p.conn.Query(q)
 	if err != nil {

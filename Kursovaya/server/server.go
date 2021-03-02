@@ -30,7 +30,7 @@ func New(log *zerolog.Logger, books booksInterface) *Server {
 
 
 func (s *Server) Start() {
-	const apiAddr = ":8080"
+	const apiAddr = ":80"
 
 	s.log.Info().Str("addr", apiAddr).Msg("starting api http server")
 

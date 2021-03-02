@@ -34,7 +34,7 @@ func (p *Provider) GetResponsibleDB() ([]model.Responsible, error) {
 		responsible = make([]model.Responsible, 0)
 	)
 
-	q = `SELECT * FROM kursovaya.responsibles`
+	q = `SELECT editor_id, book_id FROM kursovaya.responsibles`
 
 	rows, err := p.conn.Query(q)
 	if err != nil {

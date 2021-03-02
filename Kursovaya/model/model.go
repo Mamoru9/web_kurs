@@ -9,7 +9,7 @@ type Author struct {
 
 type Book struct {
 	Id		int
-	Tittle  string `json:"tittle"`
+	Tittle  string `json:"title"`
 	Place   string `json:"place"`
 	Edition string `json:"edition"`
 	Year    string `json:"year"`
